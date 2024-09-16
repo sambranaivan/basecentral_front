@@ -1,7 +1,10 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes, RouterModule } from '@angular/router';
+import { LegajoComponent } from './legajo/legajo.component';
 
-const routes: Routes = [];
+const routes: Routes = [
+  { path: '', component: LegajoComponent }
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

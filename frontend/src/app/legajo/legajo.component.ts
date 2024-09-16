@@ -16,7 +16,7 @@ export class LegajoComponent implements OnInit {
 
   search(): void {
     this.legajoService.searchLegajos(this.filters).subscribe(data => {
-      this.legajos = data;
+      this.legajos = data.results;
     });
   }
 }

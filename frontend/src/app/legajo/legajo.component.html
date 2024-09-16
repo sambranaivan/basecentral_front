@@ -1,1 +1,29 @@
-<p>legajo works!</p>
+<div>
+  <h2>Búsqueda de Legajos</h2>
+  <form (ngSubmit)="search()">
+    <!-- Campos de filtro -->
+    <input type="text" [(ngModel)]="filters.estado" name="estado" placeholder="Estado" />
+    <input type="text" [(ngModel)]="filters.clave" name="clave" placeholder="Clave" />
+    <input type="text" [(ngModel)]="filters.sis_codigo" name="sis_codigo" placeholder="SIS Código" />
+    <input type="text" [(ngModel)]="filters.entidad_codigo" name="entidad_codigo" placeholder="Entidad Código" />
+    <!-- Añade inputs para todos los demás campos -->
+    <button type="submit">Buscar</button>
+  </form>
+
+  <table>
+    <tr>
+      <th>Clave</th>
+      <th>Estado</th>
+      <th>SIS Código</th>
+      <th>Entidad Código</th>
+      <!-- Otros encabezados -->
+    </tr>
+    <tr *ngFor="let legajo of legajos">
+      <td>{{ legajo.clave }}</td>
+      <td>{{ legajo.estado }}</td>
+      <td>{{ legajo.sis_codigo }}</td>
+      <td>{{ legajo.entidad_codigo }}</td>
+      <!-- Otros campos -->
+    </tr>
+  </table>
+</div>
