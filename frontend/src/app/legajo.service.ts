@@ -10,13 +10,17 @@ export class LegajoService {
 
   constructor(private http: HttpClient) {}
 
-  searchLegajos(filters: any): Observable<any> {
-    let params = new HttpParams();
+  searchLegajos(filters: any, page: number = 1, ordering: string = 'clave'): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('ordering', ordering);
+  
     Object.keys(filters).forEach(key => {
       if (filters[key]) {
         params = params.append(key, filters[key]);
       }
     });
+  
     return this.http.get(this.apiUrl, { params });
   }
 }
