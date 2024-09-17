@@ -8,6 +8,20 @@
     <input type="text" [(ngModel)]="filters.entidad_codigo" name="entidad_codigo" placeholder="Entidad Código" />
     <input type="text" [(ngModel)]="filters.caratula" name="caratula" placeholder="caratula" />
     <!-- Añade inputs para todos los demás campos -->
+     <!-- Filtros de fecha con rango -->
+     <div>
+      <label>Fecha Alta Desde:</label>
+      <input type="date" [(ngModel)]="filters.fecha_alta_date_from" name="fecha_alta_date_from" />
+      <label>Hasta:</label>
+      <input type="date" [(ngModel)]="filters.fecha_alta_date_to" name="fecha_alta_date_to" />
+    </div>
+
+    <div>
+      <label>Fecha Radicación Desde:</label>
+      <input type="date" [(ngModel)]="filters.fecha_radicacion_from" name="fecha_radicacion_from" />
+      <label>Hasta:</label>
+      <input type="date" [(ngModel)]="filters.fecha_radicacion_to" name="fecha_radicacion_to" />
+    </div>
     <button type="submit">Buscar</button>
   </form>
 
@@ -17,6 +31,9 @@
       <th>Estado</th>
       <th>SIS Código</th>
       <th>Entidad Código</th>
+      <th>Caratula</th>
+      <th>Fecha Alta</th>
+      <th>Fecha Radicacion</th>
       <!-- Otros encabezados -->
     </tr>
     <tr *ngFor="let legajo of legajos">
@@ -26,6 +43,8 @@
       <td>{{ legajo.entidad_codigo }}</td>
       <td>{{ legajo.caratula }}</td>
       <!-- Otros campos -->
+      <td>{{ legajo.fecha_alta_date | date: 'dd/MM/yyyy' }}</td>
+      <td>{{ legajo.fecha_radicacion | date: 'dd/MM/yyyy' }}</td>
     </tr>
   </table>
   <div *ngIf="totalPages">
