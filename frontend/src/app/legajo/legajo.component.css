@@ -1,0 +1,66 @@
+.container {
+    padding: 16px;
+  }
+  
+  .search-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .filter-input {
+    display: flex;
+    align-items: center;
+  }
+  
+  .date-range {
+    display: flex;
+    align-items: center;
+  }
+  
+  .date-range mat-form-field {
+    margin-right: 8px;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+    margin-top: 16px;
+  }
+  
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  
+  .pagination button {
+    margin: 0 8px;
+  }
+  
+  .responsive-table {
+    width: 100%;
+    min-width: 600px; /* Ajusta este valor según tus necesidades */
+  }
+  
+  /* legajo.component.css */
+
+/* ... estilos existentes ... */
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8); /* Fondo semitransparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Asegura que esté por encima de otros elementos */
+}

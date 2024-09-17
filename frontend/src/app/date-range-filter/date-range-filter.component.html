@@ -1,0 +1,16 @@
+<div class="date-range">
+    <mat-form-field appearance="fill">
+      <mat-label>{{ field }} Desde</mat-label>
+      <input matInput [matDatepicker]="pickerFrom" [(ngModel)]="filters[field + '_from']" [name]="field + '_from'" />
+      <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+      <mat-datepicker #pickerFrom></mat-datepicker>
+    </mat-form-field>
+  
+    <mat-form-field appearance="fill">
+      <mat-label>{{ field }} Hasta</mat-label>
+      <input matInput [matDatepicker]="pickerTo" [(ngModel)]="filters[field + '_to']" [name]="field + '_to'" />
+      <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+      <mat-datepicker #pickerTo></mat-datepicker>
+    </mat-form-field>
+  </div>
+  

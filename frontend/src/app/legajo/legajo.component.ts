@@ -13,62 +13,61 @@ export class LegajoComponent implements OnInit {
   totalPages: number = 1;
   page_size:number = 10;
   entidadDefinition: any;
-  entidad = 'Legajo'; // Nombre de la entidad a consultar
+  entidad = 'Legajo';
+  isLoading: boolean = false;
+  displayedColumns: string[] = ['clave', 'estado', 'fecha_alta_date','caratula', 'acciones'];
 
-  availableFields: string[] = []; // Campos disponibles para filtrar
-  selectedFilters: { field: string, type: string }[] = []; // Filtros agregados por el usuario
-  remainingFields: string[] = []; // Campos que aún no han sido seleccionados
-
+  availableFields: string[] = [];
+  selectedFilters: { field: string, type: string }[] = [];
+  remainingFields: string[] = [];
 
   constructor(private legajoService: LegajoService) {}
 
   ngOnInit(): void {
-    // Obtener la definición de la entidad al inicializar el componente
     this.legajoService.getEntidadDefinition(this.entidad).subscribe(definition => {
       this.entidadDefinition = definition;
       this.availableFields = Object.keys(this.entidadDefinition);
-      console.log(this.availableFields)
       this.remainingFields = [...this.availableFields];
     });
   }
 
-   // Función para agregar un nuevo filtro
-   addFilter(): void {
-    // Si aún hay campos disponibles
+  addFilter(): void {
     if (this.remainingFields.length > 0) {
-      const field = ''; // Valor por defecto
-      const type = ''; // Tipo de campo
+      const field = '';
+      const type = '';
       this.selectedFilters.push({ field, type });
     }
   }
 
-  // Función para actualizar el tipo cuando se selecciona un campo
   onFieldSelected(filterIndex: number): void {
     const field = this.selectedFilters[filterIndex].field;
     const type = this.entidadDefinition[field];
     this.selectedFilters[filterIndex].type = type;
 
-    // Eliminar el campo de los campos disponibles para evitar duplicados
     this.remainingFields = this.remainingFields.filter(f => f !== field);
+
+    // Inicializar valores de filtros
+    if (type === 'DateTimeField' || field.includes('fecha')) {
+      this.filters[field + '_from'] = null;
+      this.filters[field + '_to'] = null;
+    } else {
+      this.filters[field] = null;
+    }
   }
 
-   // Función para eliminar un filtro
-   removeFilter(index: number): void {
+  removeFilter(index: number): void {
     const field = this.selectedFilters[index].field;
 
-    // Agregar el campo nuevamente a los campos disponibles
     if (field) {
       this.remainingFields.push(field);
     }
-
-    // Eliminar el filtro de la lista
     this.selectedFilters.splice(index, 1);
   }
 
   search(page: number = 1): void {
     this.currentPage = page;
+    this.isLoading = true; // Iniciar el indicador de carga
     
-    // Construir los filtros a partir de los filtros seleccionados
     const processedFilters: any = {};
   
     this.selectedFilters.forEach(filter => {
@@ -76,7 +75,6 @@ export class LegajoComponent implements OnInit {
       const type = filter.type;
   
       if (type === 'DateTimeField' || field.includes('fecha')) {
-        // Procesar fechas como rango
         const fromValue = this.filters[field + '_from'];
         const toValue = this.filters[field + '_to'];
   
@@ -96,21 +94,20 @@ export class LegajoComponent implements OnInit {
       }
     });
   
-    this.legajoService.searchLegajos(processedFilters, this.currentPage).subscribe(data => {
-      this.legajos = data.results;
-      this.totalPages = Math.ceil(data.count / this.page_size);
-    });
+    this.legajoService.searchLegajos(processedFilters, this.currentPage).subscribe(
+      data => {
+        this.legajos = data.results;
+        this.totalPages = Math.ceil(data.count / this.page_size);
+        this.isLoading = false; // Finalizar el indicador de carga
+      },
+      error => {
+        console.error('Error en la búsqueda de legajos', error);
+        this.isLoading = false; // Finalizar el indicador de carga en caso de error
+      }
+    );
   }
 
-    // Función para obtener los campos sin duplicados (ejcluir campos como 'fecha_alta_date_from')
-    getFields(): string[] {
-      return Object.keys(this.entidadDefinition).filter(field => {
-        return !field.endsWith('_from') && !field.endsWith('_to');
-      });
-    }
-  
-   // Función para obtener los campos a mostrar en los resultados
-   getResultFields(): string[] {
+  getResultFields(): string[] {
     if (this.legajos.length > 0) {
       return Object.keys(this.legajos[0]);
     }
