@@ -12,10 +12,21 @@ export class LegajoComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
   page_size:number = 10;
+  entidadDefinition: any;
+  entidad = 'Legajo'; // Nombre de la entidad a consultar
 
   constructor(private legajoService: LegajoService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Obtener la definición de la entidad al inicializar el componente
+    this.legajoService.getEntidadDefinition(this.entidad).subscribe(definition => {
+      this.entidadDefinition = definition;
+      // Inicializar los filtros con valores vacíos
+      Object.keys(this.entidadDefinition).forEach(key => {
+        this.filters[key] = '';
+      });
+    });
+  }
 
   search(page: number = 1): void {
     this.currentPage = page;
@@ -34,4 +45,19 @@ export class LegajoComponent implements OnInit {
       this.totalPages = Math.ceil(data.count / this.page_size); // Suponiendo PAGE_SIZE = 10
     });
   }
+
+    // Función para obtener los campos sin duplicados (ejcluir campos como 'fecha_alta_date_from')
+    getFields(): string[] {
+      return Object.keys(this.entidadDefinition).filter(field => {
+        return !field.endsWith('_from') && !field.endsWith('_to');
+      });
+    }
+  
+    // Función para obtener los campos a mostrar en los resultados
+    getResultFields(): string[] {
+      if (this.legajos.length > 0) {
+        return Object.keys(this.legajos[0]);
+      }
+      return [];
+    }
 }

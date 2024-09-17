@@ -1,52 +1,42 @@
 <div>
   <h2>Búsqueda de Legajos</h2>
   <form (ngSubmit)="search()">
-    <!-- Campos de filtro -->
-    <input type="text" [(ngModel)]="filters.estado" name="estado" placeholder="Estado" />
-    <input type="text" [(ngModel)]="filters.clave" name="clave" placeholder="Clave" />
-    <input type="text" [(ngModel)]="filters.sis_codigo" name="sis_codigo" placeholder="SIS Código" />
-    <input type="text" [(ngModel)]="filters.entidad_codigo" name="entidad_codigo" placeholder="Entidad Código" />
-    <input type="text" [(ngModel)]="filters.caratula" name="caratula" placeholder="caratula" />
-    <!-- Añade inputs para todos los demás campos -->
-     <!-- Filtros de fecha con rango -->
-     <div>
-      <label>Fecha Alta Desde:</label>
-      <input type="date" [(ngModel)]="filters.fecha_alta_date_from" name="fecha_alta_date_from" />
-      <label>Hasta:</label>
-      <input type="date" [(ngModel)]="filters.fecha_alta_date_to" name="fecha_alta_date_to" />
-    </div>
-
-    <div>
-      <label>Fecha Radicación Desde:</label>
-      <input type="date" [(ngModel)]="filters.fecha_radicacion_from" name="fecha_radicacion_from" />
-      <label>Hasta:</label>
-      <input type="date" [(ngModel)]="filters.fecha_radicacion_to" name="fecha_radicacion_to" />
+    <div *ngIf="entidadDefinition">
+      <div *ngFor="let field of getFields()">
+        <label>{{ field }}</label>
+        <ng-container [ngSwitch]="entidadDefinition[field]">
+          <!-- Campos de texto -->
+          <input *ngSwitchCase="'CharField'" type="text" [(ngModel)]="filters[field]" [name]="field" />
+          <!-- Campos numéricos -->
+          <input *ngSwitchCase="'IntegerField'" type="number" [(ngModel)]="filters[field]" [name]="field" />
+          <!-- Campos de fecha -->
+          <div *ngSwitchCase="'DateTimeField'">
+            <label>Desde:</label>
+            <input type="date" [(ngModel)]="filters[field + '_from']" [name]="field + '_from'" />
+            <label>Hasta:</label>
+            <input type="date" [(ngModel)]="filters[field + '_to']" [name]="field + '_to'" />
+          </div>
+          <!-- Otros tipos de campos según sea necesario -->
+          <input *ngSwitchDefault type="text" [(ngModel)]="filters[field]" [name]="field" />
+        </ng-container>
+      </div>
     </div>
     <button type="submit">Buscar</button>
   </form>
 
+  <!-- Tabla de resultados -->
   <table>
     <tr>
-      <th>Clave</th>
-      <th>Estado</th>
-      <th>SIS Código</th>
-      <th>Entidad Código</th>
-      <th>Caratula</th>
-      <th>Fecha Alta</th>
-      <th>Fecha Radicacion</th>
-      <!-- Otros encabezados -->
+      <!-- Generar encabezados dinámicamente -->
+      <th *ngFor="let field of getResultFields()">{{ field }}</th>
     </tr>
     <tr *ngFor="let legajo of legajos">
-      <td>{{ legajo.clave }}</td>
-      <td>{{ legajo.estado }}</td>
-      <td>{{ legajo.sis_codigo }}</td>
-      <td>{{ legajo.entidad_codigo }}</td>
-      <td>{{ legajo.caratula }}</td>
-      <!-- Otros campos -->
-      <td>{{ legajo.fecha_alta_date | date: 'dd/MM/yyyy' }}</td>
-      <td>{{ legajo.fecha_radicacion | date: 'dd/MM/yyyy' }}</td>
+      <!-- Mostrar valores dinámicamente -->
+      <td *ngFor="let field of getResultFields()">{{ legajo[field] }}</td>
     </tr>
   </table>
+
+  <!-- Navegación de páginas -->
   <div *ngIf="totalPages">
     <button (click)="search(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
     <span>Página {{ currentPage }} de {{ totalPages }}</span>
