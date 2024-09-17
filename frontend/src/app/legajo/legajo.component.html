@@ -1,26 +1,44 @@
 <div>
   <h2>Búsqueda de Legajos</h2>
   <form (ngSubmit)="search()">
-    <div *ngIf="entidadDefinition">
-      <div *ngFor="let field of getFields()">
-        <label>{{ field }}</label>
-        <ng-container [ngSwitch]="entidadDefinition[field]">
+
+    <!-- Botón para agregar filtros -->
+    <button type="button" (click)="addFilter()">Agregar Filtro</button>
+
+    <!-- Mostrar los filtros agregados -->
+    <div *ngFor="let filter of selectedFilters; let i = index">
+      <!-- Select para elegir el campo -->
+      <div *ngIf="!filter.field">
+        <label>Seleccione un campo:</label>
+        <select [(ngModel)]="selectedFilters[i].field" (change)="onFieldSelected(i)" [name]="'field_' + i">
+          <option *ngFor="let field of remainingFields" [value]="field">{{ field }}</option>
+        </select>
+      </div>
+
+      <!-- Mostrar el input correspondiente al tipo de campo -->
+      <div *ngIf="filter.field">
+        <label>{{ filter.field }}</label>
+        <ng-container [ngSwitch]="filter.type">
           <!-- Campos de texto -->
-          <input *ngSwitchCase="'CharField'" type="text" [(ngModel)]="filters[field]" [name]="field" />
+          <input *ngSwitchCase="'CharField'" type="text" [(ngModel)]="filters[filter.field]" [name]="filter.field" />
+          <input *ngSwitchCase="'equal'" type="text" [(ngModel)]="filters[filter.field]" [name]="filter.field" />
           <!-- Campos numéricos -->
-          <input *ngSwitchCase="'IntegerField'" type="number" [(ngModel)]="filters[field]" [name]="field" />
+          <input *ngSwitchCase="'IntegerField'" type="number" [(ngModel)]="filters[filter.field]" [name]="filter.field" />
           <!-- Campos de fecha -->
           <div *ngSwitchCase="'DateTimeField'">
             <label>Desde:</label>
-            <input type="date" [(ngModel)]="filters[field + '_from']" [name]="field + '_from'" />
+            <input type="date" [(ngModel)]="filters[filter.field + '_from']" [name]="filter.field + '_from'" />
             <label>Hasta:</label>
-            <input type="date" [(ngModel)]="filters[field + '_to']" [name]="field + '_to'" />
+            <input type="date" [(ngModel)]="filters[filter.field + '_to']" [name]="filter.field + '_to'" />
           </div>
           <!-- Otros tipos de campos según sea necesario -->
-          <input *ngSwitchDefault type="text" [(ngModel)]="filters[field]" [name]="field" />
+          <input *ngSwitchDefault type="text" [(ngModel)]="filters[filter.field]" [name]="filter.field" />
         </ng-container>
+        <!-- Botón para eliminar el filtro -->
+        <button type="button" (click)="removeFilter(i)">Eliminar</button>
       </div>
     </div>
+
     <button type="submit">Buscar</button>
   </form>
 
