@@ -5,7 +5,7 @@ import { LegajoComponent } from './legajo/legajo.component';
 const routes: Routes = [
   // { path: '', component: LegajoComponent },
   { path: ':entity', component: LegajoComponent },
-  { path: '', redirectTo: '/Legajo', pathMatch: 'full' },
+  { path: '', redirectTo: '/legajo', pathMatch: 'full' },
 ];
 
 @NgModule({

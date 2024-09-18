@@ -83,8 +83,8 @@ export class LegajoComponent implements OnInit {
 
   search(page: number = 1): void {
     this.currentPage = page;
-    this.isLoading = true; // Iniciar el indicador de carga
-    
+    this.isLoading = true;
+  
     const processedFilters: any = {};
   
     this.selectedFilters.forEach(filter => {
@@ -111,18 +111,22 @@ export class LegajoComponent implements OnInit {
       }
     });
   
-    this.legajoService.searchLegajos(processedFilters, this.currentPage).subscribe(
+    // Specify the fields you want to retrieve, or leave empty to get all fields
+    const campos = ['clave','caratula']; // Or specify ['clave', 'estado', ...] if needed
+  
+    this.legajoService.searchLegajos(this.entidad, processedFilters, this.currentPage, 'clave', campos).subscribe(
       data => {
         this.legajos = data.results;
-        this.totalPages = Math.ceil(data.count / this.page_size);
-        this.isLoading = false; // Finalizar el indicador de carga
+        this.totalPages = Math.ceil(data.count / data.page_size);
+        this.isLoading = false;
       },
       error => {
-        console.error('Error en la búsqueda de legajos', error);
-        this.isLoading = false; // Finalizar el indicador de carga en caso de error
+        console.error('Error en la búsqueda', error);
+        this.isLoading = false;
       }
     );
   }
+  
 
   getResultFields(): string[] {
     if (this.legajos.length > 0) {
