@@ -2,6 +2,8 @@
 FROM node:14-alpine as build
 WORKDIR /app
 COPY package.json package-lock.json ./
+RUN npm config set strict-ssl false
+RUN npm config set ca ""
 RUN npm install
 COPY . .
 RUN npm run build --prod
