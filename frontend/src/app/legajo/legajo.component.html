@@ -1,111 +1,131 @@
 <mat-toolbar color="primary">
+  <!-- Botón de menú para abrir el sidenav -->
+  <button mat-icon-button (click)="sidenav.toggle()" aria-label="Abrir configuración de filtros">
+    <mat-icon>settings</mat-icon>
+  </button>
   <span>Gestión de {{ entidad }}</span>
 </mat-toolbar>
 
-<div class="container">
-  <h2>Búsqueda de {{ entidad }}</h2>
-  <app-filter-config
-  [entidad]="entidad"
-  (configChanged)="onConfigChanged($event)">
-</app-filter-config>
-  
-  <div class="formulario">
-    <form (ngSubmit)="search()" class="search-form">
+<mat-sidenav-container class="sidenav-container">
+  <!-- El sidenav a la derecha -->
+  <mat-sidenav #sidenav mode="side" position="start">
+    <!-- Componente de Configuración de Filtros -->
+    <app-filter-config [entidad]="entidad" (configChanged)="onConfigChanged($event)">
+    </app-filter-config>
+  </mat-sidenav>
 
-      <!-- Botón para agregar filtros -->
-      <button mat-mini-fab color="primary" type="button" (click)="addFilter()">
-        <mat-icon>add</mat-icon>
-      </button>
-      <span>Agregar Filtro</span>
-  
-      <!-- Mostrar los filtros agregados -->
-      <div *ngFor="let filter of selectedFilters; let i = index" class="filter-group">
-        <!-- Select para elegir el campo -->
-        <div *ngIf="!filter.field">
-          <mat-form-field appearance="fill">
-            <mat-label>Seleccione un campo</mat-label>
-            <mat-select [(value)]="selectedFilters[i].field" (selectionChange)="onFieldSelected(i)">
-              <mat-option *ngFor="let field of remainingFields" [value]="field">{{ field }}</mat-option>
-            </mat-select>
-          </mat-form-field>
+
+
+
+
+  <!-- El contenido principal -->
+  <mat-sidenav-content>
+    <div class="container">
+      <!-- Diseño ajustado -->
+      <div class="content-layout">
+        <!-- Filtros de búsqueda a la izquierda -->
+        <div class="search-filters">
+          <h2>Búsqueda de {{ entidad }}</h2>
+          <!-- Formulario de búsqueda existente -->
+          <form (ngSubmit)="search()" class="search-form">
+            <!-- Código existente para agregar filtros -->
+
+            <!-- Botón para agregar filtros -->
+            <button mat-mini-fab color="primary" type="button" (click)="addFilter()">
+              <mat-icon>add</mat-icon>
+            </button>
+            <span></span>
+
+            <!-- Mostrar los filtros agregados -->
+            <div *ngFor="let filter of selectedFilters; let i = index" class="filter-group">
+              <!-- Select para elegir el campo -->
+              <div *ngIf="!filter.field">
+                <mat-form-field appearance="fill">
+                  <mat-label>Seleccione un campo</mat-label>
+                  <mat-select [(value)]="selectedFilters[i].field" (selectionChange)="onFieldSelected(i)">
+                    <mat-option *ngFor="let field of remainingFields" [value]="field">{{ field }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <!-- Mostrar el input correspondiente al tipo de campo -->
+              <div *ngIf="filter.field" class="filter-input">
+                <ng-container [ngSwitch]="filter.type">
+                  <!-- Campos de texto y numéricos -->
+                  <mat-form-field appearance="fill" *ngSwitchCase="'CharField'">
+                    <mat-label>{{ filter.field }}</mat-label>
+                    <input matInput [(ngModel)]="filters[filter.field]" [name]="filter.field" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" *ngSwitchCase="'IntegerField'">
+                    <mat-label>{{ filter.field }}</mat-label>
+                    <input matInput type="number" [(ngModel)]="filters[filter.field]" [name]="filter.field" />
+                  </mat-form-field>
+                  <!-- Campos de fecha -->
+                  <ng-container *ngSwitchCase="'DateTimeField'">
+                    <app-date-range-filter [field]="filter.field" [filters]="filters">
+                    </app-date-range-filter>
+                  </ng-container>
+                </ng-container>
+
+                <!-- Botón para eliminar el filtro -->
+                <button mat-icon-button color="warn" type="button" (click)="removeFilter(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Botón de buscar -->
+            <div class="search-button-container">
+              <button mat-mini-fab color="primary" type="submit">
+                <mat-icon>search</mat-icon>
+              </button>
+            </div>
+
+          </form>
         </div>
-  
-        <!-- Mostrar el input correspondiente al tipo de campo -->
-        <div *ngIf="filter.field" class="filter-input">
-          <ng-container [ngSwitch]="filter.type">
-            <!-- Campos de texto y numéricos -->
-            <mat-form-field appearance="fill" *ngSwitchCase="'CharField'">
-              <mat-label>{{ filter.field }}</mat-label>
-              <input matInput [(ngModel)]="filters[filter.field]" [name]="filter.field" />
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngSwitchCase="'IntegerField'">
-              <mat-label>{{ filter.field }}</mat-label>
-              <input matInput type="number" [(ngModel)]="filters[filter.field]" [name]="filter.field" />
-            </mat-form-field>
-            <!-- Campos de fecha -->
-            <ng-container *ngSwitchCase="'DateTimeField'">
-              <app-date-range-filter
-                [field]="filter.field"
-                [filters]="filters">
-              </app-date-range-filter>
+
+        <div *ngIf="isLoading" class="loading-overlay">
+          <mat-spinner></mat-spinner>
+        </div>
+        <!-- ... código de la tabla y paginación ... -->
+        <!-- Tabla de resultados -->
+        <div class="table-container" *ngIf="!isLoading">
+          <table mat-table [dataSource]="legajos" class="mat-elevation-z8 responsive-table">
+            <!-- Generate columns dynamically -->
+            <ng-container *ngFor="let column of getResultFields()" [matColumnDef]="column">
+              <th mat-header-cell *matHeaderCellDef> {{ column }} </th>
+              <td mat-cell *matCellDef="let element">
+                <span [ngSwitch]="column">
+                  <!-- For 'caratula' or other long text fields -->
+                  <span *ngSwitchCase="'caratula'" class="truncate" matTooltip="{{element[column]}}">
+                    {{ element[column] | slice:0:50 }}{{ element[column].length > 50 ? '...' : '' }}
+                  </span>
+                  <!-- Default case -->
+                  <span *ngSwitchDefault>{{ element[column] }}</span>
+                </span>
+              </td>
             </ng-container>
-          </ng-container>
-  
-          <!-- Botón para eliminar el filtro -->
-          <button mat-icon-button color="warn" type="button" (click)="removeFilter(i)">
-            <mat-icon>delete</mat-icon>
+
+            <tr mat-header-row *matHeaderRowDef="getResultFields()"></tr>
+            <tr mat-row *matRowDef="let row; columns: getResultFields();"></tr>
+          </table>
+
+        </div>
+
+
+        <!-- Navegación de páginas -->
+        <div *ngIf="totalPages" class="pagination">
+          <button mat-button (click)="search(currentPage - 1)" [disabled]="currentPage === 1">
+            <mat-icon>navigate_before</mat-icon>
+            Anterior
+          </button>
+          <span>Página {{ currentPage }} de {{ totalPages }}</span>
+          <button mat-button (click)="search(currentPage + 1)" [disabled]="currentPage === totalPages">
+            Siguiente
+            <mat-icon>navigate_next</mat-icon>
           </button>
         </div>
       </div>
-  
-      <!-- Botón de búsqueda -->
-      <button mat-raised-button color="primary" type="submit">
-        <mat-icon>search</mat-icon>
-        Buscar
-      </button>
-    </form>
-  </div>
-
-  <div *ngIf="isLoading" class="loading-overlay">
-    <mat-spinner></mat-spinner>
-  </div>
-  <!-- ... código de la tabla y paginación ... -->
-   <!-- Tabla de resultados -->
-   <div class="table-container" *ngIf="!isLoading">
-    <table mat-table [dataSource]="legajos" class="mat-elevation-z8 responsive-table">
-      <!-- Generate columns dynamically -->
-      <ng-container *ngFor="let column of getResultFields()" [matColumnDef]="column">
-        <th mat-header-cell *matHeaderCellDef> {{ column }} </th>
-        <td mat-cell *matCellDef="let element">
-          <span [ngSwitch]="column">
-            <!-- For 'caratula' or other long text fields -->
-            <span *ngSwitchCase="'caratula'" class="truncate" matTooltip="{{element[column]}}">
-              {{ element[column] | slice:0:50 }}{{ element[column].length > 50 ? '...' : '' }}
-            </span>
-            <!-- Default case -->
-            <span *ngSwitchDefault>{{ element[column] }}</span>
-          </span>
-        </td>
-      </ng-container>
-  
-      <tr mat-header-row *matHeaderRowDef="getResultFields()"></tr>
-      <tr mat-row *matRowDef="let row; columns: getResultFields();"></tr>
-    </table>
- 
-   </div>
-    <!-- Navegación de páginas -->
-  <div *ngIf="totalPages" class="pagination">
-    <button mat-button (click)="search(currentPage - 1)" [disabled]="currentPage === 1">
-      <mat-icon>navigate_before</mat-icon>
-      Anterior
-    </button>
-    <span>Página {{ currentPage }} de {{ totalPages }}</span>
-    <button mat-button (click)="search(currentPage + 1)" [disabled]="currentPage === totalPages">
-      Siguiente
-      <mat-icon>navigate_next</mat-icon>
-    </button>
-  </div>
-  
-
-  
-</div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

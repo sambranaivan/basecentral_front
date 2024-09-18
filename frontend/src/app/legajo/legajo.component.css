@@ -77,3 +77,49 @@
 .mat-table {
   width: 100%;
 }
+
+.sidenav-container {
+  height: 100%;
+}
+
+.mat-sidenav-content {
+  padding: 16px;
+}
+
+.content-layout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.search-filters {
+  flex: 1 1 80%;
+  min-width: 300px;
+  margin-right: 16px;
+}
+
+.table-container {
+  width: 100%;
+  margin-top: 16px;
+}
+
+/* Ajustar el formulario de búsqueda */
+.search-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-button-container {
+  margin-top: 16px;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 600px) {
+  .content-layout {
+    flex-direction: column;
+  }
+  .search-filters {
+    flex: 1 1 100%;
+    margin-right: 0;
+  }
+}

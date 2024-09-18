@@ -6,3 +6,7 @@
     margin-bottom: 16px;
   }
   
+
+  .page-size-field {
+    max-width: 200px; /* Ajusta según sea necesario */
+  }
