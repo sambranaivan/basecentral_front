@@ -12,27 +12,35 @@ export class LegajoComponent implements OnInit {
   legajos: any[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
-  page_size:number = 10;
   entidadDefinition: any;
-  entidad: string = 'Legajo';
+  entidad: string = 'legajo';
   isLoading: boolean = false;
-  displayedColumns: string[] = ['clave', 'estado', 'fecha_alta_date','caratula', 'acciones'];
 
   availableFields: string[] = [];
   selectedFilters: { field: string, type: string }[] = [];
   remainingFields: string[] = [];
 
+  campos: string[] = ['clave', 'estado'];
+  pageSize: number = 10;
+
   constructor(
-    private legajoService: LegajoService,   
-    private route: ActivatedRoute) {}
+    private legajoService: LegajoService,
+    private route: ActivatedRoute) { }
 
   ngOnInit(): void {
 
-     // Get the entity from the route parameters
-     this.route.params.subscribe(params => {
+    // Get the entity from the route parameters
+    this.route.params.subscribe(params => {
       this.entidad = params['entity'];
       this.loadEntityDefinition();
     });
+  }
+
+  onConfigChanged(config: { campos: string[], page_size: number }): void {
+    this.campos = config.campos;
+    this.pageSize = config.page_size;
+    // Optionally, you can reset the current page or refresh the data
+    this.search();
   }
 
   loadEntityDefinition(): void {
@@ -84,17 +92,17 @@ export class LegajoComponent implements OnInit {
   search(page: number = 1): void {
     this.currentPage = page;
     this.isLoading = true;
-  
+
     const processedFilters: any = {};
-  
+
     this.selectedFilters.forEach(filter => {
       const field = filter.field;
       const type = filter.type;
-  
+
       if (type === 'DateTimeField' || field.includes('fecha')) {
         const fromValue = this.filters[field + '_from'];
         const toValue = this.filters[field + '_to'];
-  
+
         if (fromValue) {
           const dateFrom = new Date(fromValue);
           processedFilters[field + '_from'] = dateFrom.toISOString().split('T')[0];
@@ -110,14 +118,21 @@ export class LegajoComponent implements OnInit {
         }
       }
     });
-  
+
     // Specify the fields you want to retrieve, or leave empty to get all fields
-    const campos = ['clave','caratula']; // Or specify ['clave', 'estado', ...] if needed
-  
-    this.legajoService.searchLegajos(this.entidad, processedFilters, this.currentPage, 'clave', campos).subscribe(
+    // const campos = ['clave','caratula']; // Or specify ['clave', 'estado', ...] if needed
+
+    this.legajoService.searchLegajos(
+      this.entidad,
+      processedFilters,
+      this.currentPage,
+      'clave',
+      this.campos,
+      this.pageSize
+    ).subscribe(
       data => {
         this.legajos = data.results;
-        this.totalPages = Math.ceil(data.count / data.page_size);
+        this.totalPages = Math.ceil(data.count / this.pageSize);
         this.isLoading = false;
       },
       error => {
@@ -126,7 +141,7 @@ export class LegajoComponent implements OnInit {
       }
     );
   }
-  
+
 
   getResultFields(): string[] {
     if (this.legajos.length > 0) {
@@ -134,4 +149,13 @@ export class LegajoComponent implements OnInit {
     }
     return [];
   }
+
+  // getResultFields(): string[] {
+  //   if (this.campos.length > 0) {
+  //     return this.campos;
+  //   } else if (this.legajos.length > 0) {
+  //     return Object.keys(this.legajos[0]);
+  //   }
+  //   return [];
+  // }
 }

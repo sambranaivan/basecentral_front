@@ -18,6 +18,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { DateRangeFilterComponent } from './date-range-filter/date-range-filter.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FilterConfigComponent } from './filter-config/filter-config.component';
 
 
 
@@ -25,7 +26,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   declarations: [
     AppComponent,
     LegajoComponent,
-    DateRangeFilterComponent
+    DateRangeFilterComponent,
+    FilterConfigComponent
   ],
   imports: [
     BrowserModule,

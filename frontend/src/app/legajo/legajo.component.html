@@ -1,128 +1,99 @@
 <mat-toolbar color="primary">
-  <span>Gestión de Legajos</span>
+  <span>Gestión de {{ entidad }}</span>
 </mat-toolbar>
 
 <div class="container">
-  <h2>Búsqueda de Legajos</h2>
-  <form (ngSubmit)="search()" class="search-form">
+  <h2>Búsqueda de {{ entidad }}</h2>
+  <app-filter-config
+  [entidad]="entidad"
+  (configChanged)="onConfigChanged($event)">
+</app-filter-config>
+  
+  <div class="formulario">
+    <form (ngSubmit)="search()" class="search-form">
 
-    <!-- Botón para agregar filtros -->
-    <button mat-mini-fab color="primary" type="button" (click)="addFilter()">
-      <mat-icon>add</mat-icon>
-    </button>
-    <span>Agregar Filtro</span>
-
-    <!-- Mostrar los filtros agregados -->
-    <div *ngFor="let filter of selectedFilters; let i = index" class="filter-group">
-      <!-- Select para elegir el campo -->
-      <div *ngIf="!filter.field">
-        <mat-form-field appearance="fill">
-          <mat-label>Seleccione un campo</mat-label>
-          <mat-select [(value)]="selectedFilters[i].field" (selectionChange)="onFieldSelected(i)">
-            <mat-option *ngFor="let field of remainingFields" [value]="field">{{ field }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <!-- Mostrar el input correspondiente al tipo de campo -->
-      <div *ngIf="filter.field" class="filter-input">
-        <ng-container [ngSwitch]="filter.type">
-          <!-- Campos de texto y numéricos -->
-          <mat-form-field appearance="fill" *ngSwitchCase="'CharField'">
-            <mat-label>{{ filter.field }}</mat-label>
-            <input matInput [(ngModel)]="filters[filter.field]" [name]="filter.field" />
+      <!-- Botón para agregar filtros -->
+      <button mat-mini-fab color="primary" type="button" (click)="addFilter()">
+        <mat-icon>add</mat-icon>
+      </button>
+      <span>Agregar Filtro</span>
+  
+      <!-- Mostrar los filtros agregados -->
+      <div *ngFor="let filter of selectedFilters; let i = index" class="filter-group">
+        <!-- Select para elegir el campo -->
+        <div *ngIf="!filter.field">
+          <mat-form-field appearance="fill">
+            <mat-label>Seleccione un campo</mat-label>
+            <mat-select [(value)]="selectedFilters[i].field" (selectionChange)="onFieldSelected(i)">
+              <mat-option *ngFor="let field of remainingFields" [value]="field">{{ field }}</mat-option>
+            </mat-select>
           </mat-form-field>
-          <mat-form-field appearance="fill" *ngSwitchCase="'IntegerField'">
-            <mat-label>{{ filter.field }}</mat-label>
-            <input matInput type="number" [(ngModel)]="filters[filter.field]" [name]="filter.field" />
-          </mat-form-field>
-          <!-- Campos de fecha -->
-          <ng-container *ngSwitchCase="'DateTimeField'">
-            <app-date-range-filter
-              [field]="filter.field"
-              [filters]="filters">
-            </app-date-range-filter>
+        </div>
+  
+        <!-- Mostrar el input correspondiente al tipo de campo -->
+        <div *ngIf="filter.field" class="filter-input">
+          <ng-container [ngSwitch]="filter.type">
+            <!-- Campos de texto y numéricos -->
+            <mat-form-field appearance="fill" *ngSwitchCase="'CharField'">
+              <mat-label>{{ filter.field }}</mat-label>
+              <input matInput [(ngModel)]="filters[filter.field]" [name]="filter.field" />
+            </mat-form-field>
+            <mat-form-field appearance="fill" *ngSwitchCase="'IntegerField'">
+              <mat-label>{{ filter.field }}</mat-label>
+              <input matInput type="number" [(ngModel)]="filters[filter.field]" [name]="filter.field" />
+            </mat-form-field>
+            <!-- Campos de fecha -->
+            <ng-container *ngSwitchCase="'DateTimeField'">
+              <app-date-range-filter
+                [field]="filter.field"
+                [filters]="filters">
+              </app-date-range-filter>
+            </ng-container>
           </ng-container>
-        </ng-container>
-
-        <!-- Botón para eliminar el filtro -->
-        <button mat-icon-button color="warn" type="button" (click)="removeFilter(i)">
-          <mat-icon>delete</mat-icon>
-        </button>
+  
+          <!-- Botón para eliminar el filtro -->
+          <button mat-icon-button color="warn" type="button" (click)="removeFilter(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
+  
+      <!-- Botón de búsqueda -->
+      <button mat-raised-button color="primary" type="submit">
+        <mat-icon>search</mat-icon>
+        Buscar
+      </button>
+    </form>
+  </div>
 
-    <!-- Botón de búsqueda -->
-    <button mat-raised-button color="primary" type="submit">
-      <mat-icon>search</mat-icon>
-      Buscar
-    </button>
-  </form>
   <div *ngIf="isLoading" class="loading-overlay">
     <mat-spinner></mat-spinner>
   </div>
   <!-- ... código de la tabla y paginación ... -->
    <!-- Tabla de resultados -->
    <div class="table-container" *ngIf="!isLoading">
-   <table mat-table [dataSource]="legajos" class="mat-elevation-z8">
-
-    <!-- Clave Column -->
-    <ng-container matColumnDef="clave">
-      <th mat-header-cell *matHeaderCellDef> Clave </th>
-      <td mat-cell *matCellDef="let element"> {{element.clave}} </td>
-    </ng-container>
-  
-    <!-- Estado Column -->
-    <ng-container matColumnDef="estado">
-      <th mat-header-cell *matHeaderCellDef> Estado </th>
-      <td mat-cell *matCellDef="let element"> {{element.estado}} </td>
-    </ng-container>
-     <!-- Estado Column -->
-     <ng-container matColumnDef="sis_codigo">
-      <th mat-header-cell *matHeaderCellDef> sis_codigo </th>
-      <td mat-cell *matCellDef="let element"> {{element.sis_codigo}} </td>
-    </ng-container>
-      <!-- Estado Column -->
-      <ng-container matColumnDef="exp_org_creador">
-        <th mat-header-cell *matHeaderCellDef> exp_org_creador </th>
-        <td mat-cell *matCellDef="let element"> {{element.exp_org_creador}} </td>
+    <table mat-table [dataSource]="legajos" class="mat-elevation-z8 responsive-table">
+      <!-- Generate columns dynamically -->
+      <ng-container *ngFor="let column of getResultFields()" [matColumnDef]="column">
+        <th mat-header-cell *matHeaderCellDef> {{ column }} </th>
+        <td mat-cell *matCellDef="let element">
+          <span [ngSwitch]="column">
+            <!-- For 'caratula' or other long text fields -->
+            <span *ngSwitchCase="'caratula'" class="truncate" matTooltip="{{element[column]}}">
+              {{ element[column] | slice:0:50 }}{{ element[column].length > 50 ? '...' : '' }}
+            </span>
+            <!-- Default case -->
+            <span *ngSwitchDefault>{{ element[column] }}</span>
+          </span>
+        </td>
       </ng-container>
-
-     <!-- Estado Column -->
-     <ng-container matColumnDef="nivel_acceso">
-      <th mat-header-cell *matHeaderCellDef> nivel_acceso </th>
-      <td mat-cell *matCellDef="let element"> {{element.nivel_acceso}} </td>
-    </ng-container>
-     <!-- Estado Column -->
-     <ng-container matColumnDef="caratula">
-      <th mat-header-cell *matHeaderCellDef> Carátula </th>
-      <td mat-cell *matCellDef="let element">
-        <span class="truncate" matTooltip="{{element.caratula}}">
-          {{ element.caratula | slice:0:50 }}{{ element.caratula.length > 50 ? '...' : '' }}
-        </span>
-      </td>
-    </ng-container>
   
-    <!-- Fecha Alta Column -->
-    <ng-container matColumnDef="fecha_alta_date">
-      <th mat-header-cell *matHeaderCellDef> Fecha Alta </th>
-      <td mat-cell *matCellDef="let element"> {{element.fecha_alta_date | date}} </td>
-    </ng-container>
-  
-    <!-- Acciones Column -->
-    <ng-container matColumnDef="acciones">
-      <th mat-header-cell *matHeaderCellDef> Acciones </th>
-      <td mat-cell *matCellDef="let element">
-        <button mat-icon-button>
-          <mat-icon>visibility</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-  
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-  <!-- Navegación de páginas -->
+      <tr mat-header-row *matHeaderRowDef="getResultFields()"></tr>
+      <tr mat-row *matRowDef="let row; columns: getResultFields();"></tr>
+    </table>
+ 
+   </div>
+    <!-- Navegación de páginas -->
   <div *ngIf="totalPages" class="pagination">
     <button mat-button (click)="search(currentPage - 1)" [disabled]="currentPage === 1">
       <mat-icon>navigate_before</mat-icon>
@@ -134,7 +105,6 @@
       <mat-icon>navigate_next</mat-icon>
     </button>
   </div>
-   </div>
   
 
   
