@@ -64,3 +64,16 @@
   align-items: center;
   z-index: 1000; /* Asegura que esté por encima de otros elementos */
 }
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.responsive-table {
+  width: 100%;
+}
+
+.mat-table {
+  width: 100%;
+}

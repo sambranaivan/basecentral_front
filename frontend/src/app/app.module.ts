@@ -17,6 +17,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { DateRangeFilterComponent } from './date-range-filter/date-range-filter.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 
@@ -36,6 +37,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatTooltipModule,
     MatTableModule,
     MatFormFieldModule,
     MatDatepickerModule,

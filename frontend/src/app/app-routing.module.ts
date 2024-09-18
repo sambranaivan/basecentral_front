@@ -3,7 +3,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { LegajoComponent } from './legajo/legajo.component';
 
 const routes: Routes = [
-  { path: '', component: LegajoComponent }
+  // { path: '', component: LegajoComponent },
+  { path: ':entity', component: LegajoComponent },
+  { path: '', redirectTo: '/Legajo', pathMatch: 'full' },
 ];
 
 @NgModule({
