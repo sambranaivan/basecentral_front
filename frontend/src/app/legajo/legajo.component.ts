@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LegajoService } from '../legajo.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-legajo',
@@ -13,7 +14,7 @@ export class LegajoComponent implements OnInit {
   totalPages: number = 1;
   page_size:number = 10;
   entidadDefinition: any;
-  entidad = 'Legajo';
+  entidad: string = 'Legajo';
   isLoading: boolean = false;
   displayedColumns: string[] = ['clave', 'estado', 'fecha_alta_date','caratula', 'acciones'];
 
@@ -21,13 +22,29 @@ export class LegajoComponent implements OnInit {
   selectedFilters: { field: string, type: string }[] = [];
   remainingFields: string[] = [];
 
-  constructor(private legajoService: LegajoService) {}
+  constructor(
+    private legajoService: LegajoService,   
+    private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+
+     // Get the entity from the route parameters
+     this.route.params.subscribe(params => {
+      this.entidad = params['entity'];
+      this.loadEntityDefinition();
+    });
+  }
+
+  loadEntityDefinition(): void {
+    // Obtain the definition of the entity
     this.legajoService.getEntidadDefinition(this.entidad).subscribe(definition => {
       this.entidadDefinition = definition;
       this.availableFields = Object.keys(this.entidadDefinition);
       this.remainingFields = [...this.availableFields];
+      // Reset filters and results when the entity changes
+      this.filters = {};
+      this.selectedFilters = [];
+      this.legajos = [];
     });
   }
 
