@@ -25,21 +25,57 @@ export class FilterConfigComponent implements OnInit {
     this.legajoService.getEntidadDefinition(this.entidad).subscribe(definition => {
       this.entidadDefinition = definition;
       this.availableFields = Object.keys(this.entidadDefinition);
+
+        // Load saved configurations from localStorage
+        this.loadConfig();
     });
   }
 
   onFieldsChange(): void {
     this.emitConfig();
+    this.saveConfig();
   }
 
   onPageSizeChange(): void {
     this.emitConfig();
+    this.saveConfig();
   }
-
   private emitConfig(): void {
     this.configChanged.emit({
       campos: this.selectedFields,
       page_size: this.pageSize
     });
   }
+
+  private saveConfig(): void {
+    const config = {
+      campos: this.selectedFields,
+      page_size: this.pageSize
+    };
+    localStorage.setItem(`filterConfig_${this.entidad}`, JSON.stringify(config));
+  }
+
+  private loadConfig(): void {
+    const savedConfig = localStorage.getItem(`filterConfig_${this.entidad}`);
+    if (savedConfig) {
+      const config = JSON.parse(savedConfig);
+      this.selectedFields = config.campos || [];
+      this.pageSize = config.page_size || 10;
+      this.emitConfig();
+    } else {
+      // Set default values or emit empty configuration
+      this.emitConfig();
+    }
+  }
+
+  resetConfig(): void {
+    this.selectedFields = [];
+    this.pageSize = 10;
+    this.emitConfig();
+    localStorage.removeItem(`filterConfig_${this.entidad}`);
+  }
+
+  
+
+  
 }

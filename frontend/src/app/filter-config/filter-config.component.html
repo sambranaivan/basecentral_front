@@ -1,24 +1,27 @@
 <div class="filter-config">
-    <h3>Configuración de Filtros</h3>
-  
-    <!-- Fields Selection -->
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Seleccione los campos a mostrar</mat-label>
-      <mat-select multiple [(value)]="selectedFields" (selectionChange)="onFieldsChange()">
-        <mat-option *ngFor="let field of availableFields" [value]="field">
-          {{ field }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  
-    <!-- Page Size Selection -->
-    <mat-form-field appearance="fill" class="page-size-field">
-      <mat-label>Número de resultados por página</mat-label>
-      <mat-select [(value)]="pageSize" (selectionChange)="onPageSizeChange()">
-        <mat-option *ngFor="let size of pageSizeOptions" [value]="size">
-          {{ size }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
-  
+  <h3>Configuración de Filtros</h3>
+
+  <!-- Fields Selection -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Seleccione los campos a mostrar</mat-label>
+    <mat-select multiple [(value)]="selectedFields" (selectionChange)="onFieldsChange()">
+      <mat-option *ngFor="let field of availableFields" [value]="field">
+        {{ field }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Page Size Selection -->
+  <mat-form-field appearance="fill" class="page-size-field">
+    <mat-label>Número de resultados por página</mat-label>
+    <mat-select [(value)]="pageSize" (selectionChange)="onPageSizeChange()">
+      <mat-option *ngFor="let size of pageSizeOptions" [value]="size">
+        {{ size }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-button color="warn" (click)="resetConfig()">
+    <mat-icon>restore</mat-icon> Restablecer Configuración
+  </button>
+</div>

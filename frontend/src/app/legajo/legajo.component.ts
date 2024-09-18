@@ -41,7 +41,50 @@ export class LegajoComponent implements OnInit {
     this.pageSize = config.page_size;
     // Optionally, you can reset the current page or refresh the data
     this.search();
+    // Save the configuration
+    this.saveConfig();
   }
+
+  // Save and load filter configurations
+  private saveConfig(): void {
+    const config = {
+      campos: this.campos,
+      page_size: this.pageSize
+    };
+    localStorage.setItem(`filterConfig_${this.entidad}`, JSON.stringify(config));
+  }
+
+  private loadConfig(): void {
+    const savedConfig = localStorage.getItem(`filterConfig_${this.entidad}`);
+    if (savedConfig) {
+      const config = JSON.parse(savedConfig);
+      this.campos = config.campos || [];
+      this.pageSize = config.page_size || 10;
+    }
+  }
+
+  // Save and load search filters
+  private saveFilters(): void {
+    const filtersData = {
+      filters: this.filters,
+      selectedFilters: this.selectedFilters
+    };
+    localStorage.setItem(`searchFilters_${this.entidad}`, JSON.stringify(filtersData));
+  }
+
+  private loadFilters(): void {
+    const savedFilters = localStorage.getItem(`searchFilters_${this.entidad}`);
+    if (savedFilters) {
+      const filtersData = JSON.parse(savedFilters);
+      this.filters = filtersData.filters || {};
+      this.selectedFilters = filtersData.selectedFilters || [];
+    } else {
+      this.filters = {};
+      this.selectedFilters = [];
+    }
+  }
+
+
 
   loadEntityDefinition(): void {
     // Obtain the definition of the entity
@@ -50,11 +93,20 @@ export class LegajoComponent implements OnInit {
       this.availableFields = Object.keys(this.entidadDefinition);
       this.remainingFields = [...this.availableFields];
       // Reset filters and results when the entity changes
-      this.filters = {};
-      this.selectedFilters = [];
-      this.legajos = [];
+      // this.filters = {};
+      // this.selectedFilters = [];
+      // this.legajos = [];
+      // Load saved filters and configurations
+      this.loadFilters();
+      this.loadConfig();
     });
   }
+
+
+
+
+
+
 
   addFilter(): void {
     if (this.remainingFields.length > 0) {
@@ -62,6 +114,7 @@ export class LegajoComponent implements OnInit {
       const type = '';
       this.selectedFilters.push({ field, type });
     }
+    this.saveFilters();
   }
 
   onFieldSelected(filterIndex: number): void {
@@ -78,6 +131,8 @@ export class LegajoComponent implements OnInit {
     } else {
       this.filters[field] = null;
     }
+
+    this.saveFilters();
   }
 
   removeFilter(index: number): void {
@@ -87,6 +142,8 @@ export class LegajoComponent implements OnInit {
       this.remainingFields.push(field);
     }
     this.selectedFilters.splice(index, 1);
+
+    this.saveFilters();
   }
 
   search(page: number = 1): void {
@@ -118,7 +175,8 @@ export class LegajoComponent implements OnInit {
         }
       }
     });
-
+    // Save filters before making the API call
+    this.saveFilters();
     // Specify the fields you want to retrieve, or leave empty to get all fields
     // const campos = ['clave','caratula']; // Or specify ['clave', 'estado', ...] if needed
 
@@ -148,6 +206,12 @@ export class LegajoComponent implements OnInit {
       return Object.keys(this.legajos[0]);
     }
     return [];
+  }
+
+  resetFilters(): void {
+    this.filters = {};
+    this.selectedFilters = [];
+    localStorage.removeItem(`searchFilters_${this.entidad}`);
   }
 
   // getResultFields(): string[] {
